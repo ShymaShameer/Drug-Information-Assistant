@@ -1,48 +1,182 @@
-# 💊 Antidiabetic Drug Safety RAG Assistant
+# 💊 Drug Information Assistant
 
-An AI-powered pharmacovigilance intelligence tool built with **LlamaIndex**, **Groq LLM**, and **Streamlit**. 
-It answers safety questions about **SGLT2 inhibitors** and **GLP-1 receptor agonists** using official regulatory drug labeling, and every answer is traceable to the exact source passage.
+An AI-powered **Retrieval-Augmented Generation (RAG)** application built with **LlamaIndex, Groq LLM, and Streamlit**. It helps users explore official FDA drug-labeling documents and investigate how prescribing information has evolved over time.
 
-🔗 Live Web Application: [Antidiabetic drug safety-rag-assistant](https://bf9qmkknptxksxutqlvzzq.streamlit.app/) 
+The assistant uses **United States Prescribing Information (USPI) documents from 2013 to the present** for selected antidiabetic medications, allowing users to ask drug-specific questions, retrieve relevant regulatory passages, and compare labeling information across different years.
+
+🔗 **Live Web Application:** [ Drug Information Assistant](http://localhost:8501/)
+
 ---
+
 ## 📚 Data Scope
 
-The knowledge base consists of regulatory product information for the two target drug classes:
+The knowledge base contains historical and current U.S. prescribing information for seven antidiabetic medications covering two drug classes:
 
-| Source | Document type | Regulator |
-|--------|---------------|-----------|
-| **USPI** | U.S. Prescribing Information | FDA |
-| **SmPC** | Summary of Product Characteristics | EMA |
+- **SGLT2 inhibitors**
+- **GLP-1 receptor agonists**
 
-- **Drug classes:** SGLT2 inhibitors (e.g.,Canagliflozin, Dapagliflozin, Empagliflozin) and GLP-1 receptor agonists (e.g., Semaglutide, Liraglutide, Tirzepatide).
-- **Sections of interest:** contraindications, warnings and precautions, adverse reactions, drug interactions, and use in special populations.
+| Data characteristic | Description |
+|---|---|
+| Regulatory source | U.S. Food and Drug Administration (FDA) |
+| Document type | United States Prescribing Information (USPI) |
+| Time coverage | 2013 to present |
+| Drug coverage | Seven selected antidiabetic medications |
+| Main focus | Drug safety information and changes in regulatory labeling |
 
-> **Note:** This tool does not analyze individual FAERS case reports. It reflects what the approved labeling states, which makes it useful for comparing FDA and EMA safety language across products.
+The documents cover clinically relevant labeling sections, including:
+
+- Contraindications
+- Warnings and precautions
+- Adverse reactions
+- Drug interactions
+- Use in specific populations
+
+**Important:** This application focuses on information contained in official prescribing information. It does not independently analyze individual FAERS case reports or establish causal relationships between medications and adverse events.
 
 ---
 
 ## 🌟 Key Features
 
-- **HyDE & Re-Ranking Architecture:** Uses **Hypothetical Document Embeddings (HyDE)** to expand short or vague clinical queries, then re-ranks candidates with a **SentenceTransformer Reranker** (`BAAI/bge-reranker-large`) for higher contextual precision. 
-- **Strict Source Attribution:** Shows the retrieved chunks, file names, page numbers, and similarity scores in expandable containers so every claim can be checked against the label.
-- **Dynamic RAG Parameter Tuning:** Sidebar controls adjust retrieval depth (`similarity_top_k`) and the system prompt persona in real time.
-- **Streamlit Web Interface:** Persistent chat session state, one-click "New Chat" reset, and cached heavy resources via `@st.cache_resource`. The 👍/👎 buttons are UI placeholders and do not store feedback yet.
+### 1. Drug-Specific Document Retrieval
+Select a medication to explore its corresponding prescribing information and retrieve relevant passages from the available regulatory documents.
+
+### 2. Historical Year Selection
+Filter the knowledge base by year to investigate what the prescribing information stated at a particular point in time.
+
+### 3. Historical Label Comparison
+Compare prescribing information across selected years to explore how safety-related regulatory language has changed over time.
+
+### 4. RAG-Based Question Answering
+Ask natural-language questions about drug safety and receive context-grounded answers generated using retrieved passages from the source documents.
+
+### 5. HyDE and Re-Ranking Architecture
+Uses **Hypothetical Document Embeddings (HyDE)** to expand short or vague queries, followed by a **SentenceTransformer reranker** (`BAAI/bge-reranker-large`) to improve the relevance of retrieved passages.
+
+### 6. Source Attribution and Traceability
+Displays retrieved document passages and their available source information, such as file names, page numbers, and similarity scores, allowing users to inspect the underlying regulatory text.
+
+### 7. Configurable RAG Parameters
+Provides controls for retrieval depth (`similarity_top_k`) and system prompt selection to customize retrieval and response behavior.
+
+### 8. Interactive Streamlit Interface
+Includes a chat interface, drug and year selection, historical comparison functionality, and a **New Chat** option to reset the conversation.
 
 ---
 
-## 🏗️ Project Architecture & Directory Structure
+## 🏗️ Project Architecture
+
+The application follows a modular RAG architecture:
+
+1. **Document ingestion:** Historical and current USPI documents are loaded and prepared for retrieval.
+2. **Document processing:** Source documents are split into retrievable text chunks while retaining relevant document metadata.
+3. **Embedding generation:** Text chunks are converted into vector representations.
+4. **Vector retrieval:** Relevant passages are retrieved based on the user's query and selected drug/year filters.
+5. **HyDE and re-ranking:** Query expansion and reranking help improve contextual relevance.
+6. **LLM response generation:** The retrieved context is passed to the Groq-powered LLM to generate an answer.
+7. **Source verification:** Retrieved passages and their available metadata are presented for reference.
+
+---
+
+## 🛠️ Technology Stack
+
+| Component | Technology |
+|---|---|
+| Programming language | Python |
+| RAG framework | LlamaIndex |
+| LLM provider | Groq |
+| Embeddings | Hugging Face Sentence Transformers |
+| Re-ranking | `BAAI/bge-reranker-large` |
+| Vector retrieval | LlamaIndex vector index |
+| User interface | Streamlit |
+| Environment management | Conda / pip |
+
+---
+
+## 🚀 Getting Started
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/ShymaShameer/Drug-Information-Assistant.git
+cd Drug-Information-Assistant
+```
+
+### 2. Create and activate an environment
+
+Using Conda:
+
+```bash
+conda env create -f environment.yml
+conda activate your-environment-name
+```
+
+Alternatively, using pip:
+
+```bash
+pip install -r requirements.txt
+```
+
+### 3. Configure environment variables
+
+Create a `.env` file in the project root and add your Groq API key:
+
+```env
+GROQ_API_KEY=your_groq_api_key
+```
+
+Do not commit API keys or other sensitive credentials to GitHub.
+
+### 4. Run the application
+
+```bash
+streamlit run app.py
+```
+
+---
+
+## 📁 Project Structure
 
 ```text
-faers_rag/
-├── .vscode/                # VS Code workspace settings & launch configurations
-├── app.py                  # Streamlit UI layer & caching orchestration
+Drug-Information-Assistant/
+├── .vscode/                 # VS Code workspace settings
+├── app.py                   # Streamlit application interface
 ├── src/
-│   ├── engine.py           # Core RAG engine (HyDE, memory, retriever, reranker)
-│   ├── model_loader.py     # Initializers for Groq LLM & HuggingFace embeddings
-│   └── config.py           # Core application settings and RAG parameters
-├── local_storage/          # Persistent vector store index files (Git ignored)
-├── .env                    # API keys and local environment variables (Git ignored)
-├── .gitignore              # Excludes local_storage, notebooks, and environment files
-├── environment.yml         # Conda environment definition
-├── requirements.txt        # Python package dependencies
-└── README.md               # Project documentation
+│   ├── engine.py            # Core RAG pipeline and retrieval logic
+│   ├── model_loader.py      # LLM and embedding model initialization
+│   └── config.py            # Application configuration and RAG parameters
+├── local_storage/           # Persistent vector index and storage (Git ignored)
+├── .env                     # API keys and environment variables (Git ignored)
+├── .gitignore               # Git exclusion rules
+├── environment.yml          # Conda environment definition
+├── requirements.txt         # Python dependencies
+└── README.md                # Project documentation
+```
+
+*Note: Adjust the directory structure above if your current repository contains additional files or folders.*
+
+---
+
+## 🎯 Project Objective
+
+The goal of this project is to make historical regulatory drug-labeling information easier to explore and compare.
+
+By combining document retrieval, large language models, and year-based filtering, the assistant provides an interactive way to investigate how prescribing information has evolved and to support historical verification of drug safety information.
+
+The extended application also demonstrates how RAG can be used beyond conventional question answering to support **longitudinal exploration of regulatory documents**.
+
+---
+
+## ⚠️ Limitations
+
+- Responses depend on the availability, quality, and completeness of the indexed prescribing information.
+- Generated answers should always be checked against the original FDA labeling documents.
+- The application is an information-retrieval and research-support tool, not a substitute for professional medical advice or regulatory assessment.
+- The presence or absence of information in a label does not independently establish whether an adverse event is causally related to a medication.
+
+---
+
+## 👩‍💻 Author
+
+**Shyma Shameer**
+
+GitHub: [@ShymaShameer](https://github.com/ShymaShameer)

@@ -262,7 +262,7 @@ with st.sidebar:
 
     # 1. Slider to control retrieval top_k
     similarity_top_k = st.slider(
-        "Similarity Top K",
+        "Search depth",
         min_value=1,
         max_value=20,
         value=10,
@@ -271,7 +271,7 @@ with st.sidebar:
 
     # 2. Dropdown to select system prompt persona
     prompt_preset = st.selectbox(
-        "System Prompt Preset",
+        "Analysis Style",
         options=[
             "Standard Pharmacovigilance Analyst",
             "Concise Safety Summary",
